@@ -232,6 +232,26 @@ std::vector<std::string> GetMovesInCheck(std::vector<std::vector<Piece>>& board,
             // negative slope
             if ((kingY - kingX) == (checkY - checkX))
             {
+                possibleKingMoves.erase(GetNotationFromCoord(kingX - 1, kingY - 1));
+                possibleKingMoves.erase(GetNotationFromCoord(kingX + 1, kingY + 1));
+            }
+        }
+
+        // check rook
+        if (board[checkX][checkY].type == Piece::Type::ROOK)
+        {
+            // left-right
+            if (kingX == checkX)
+            {
+                possibleKingMoves.erase(GetNotationFromCoord(kingX - 1, kingY));
+                possibleKingMoves.erase(GetNotationFromCoord(kingX + 1, kingY));
+            }
+
+            // up-down
+            if (kingY == checkY)
+            {
+                possibleKingMoves.erase(GetNotationFromCoord(kingX, kingY - 1));
+                possibleKingMoves.erase(GetNotationFromCoord(kingX, kingY + 1));
             }
         }
     }
