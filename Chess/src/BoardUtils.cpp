@@ -78,7 +78,7 @@ namespace BoardUtils {
 
 	uint64_t SetBitPos(int rank, int file)
 	{
-		return 1ULL << rank * 8 + file;
+		return 1ULL << (rank * 8 + file);
 	}
 
 	bool IsNewBitPosInBounds(int newBitPos, int oldBitPos, int dir)
@@ -137,7 +137,7 @@ namespace BoardUtils {
 		int downLeft = bitPos + -9;
 		while (IsNewBitPosInBounds(downLeft, bitPos, 0))
 		{
-			bishopMoves |= Bitboard(1ULl << downLeft);
+			bishopMoves |= Bitboard(1ULL << downLeft);
 			downLeft += -9;
 		}
 		int downRight = bitPos + -7;
