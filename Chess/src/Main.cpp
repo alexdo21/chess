@@ -4,6 +4,7 @@
 
 #include "Bitboard.h"
 #include "BoardUtils.h"
+#include "Constants.h"
 
 void InitBoard()
 {
@@ -52,4 +53,7 @@ int main()
     std::cout << BoardUtils::GetBinRepr(queenD4Moves) << std::endl;
     Bitboard pawnAtD7(BoardUtils::SetBitPos(6, 3));
     std::cout << BoardUtils::GetBinRepr(queenD4Moves &= ~pawnAtD7);
+
+    std::cout << Square::a1 << std::endl;
+    std::cout << BoardUtils::SetBitPos(0, 0) << std::endl;
 }

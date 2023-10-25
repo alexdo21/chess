@@ -1,15 +1,16 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 #include <string>
+
+#include "Constants.h"
 
 class Bitboard
 {
 public:
-	Bitboard(uint64_t value);
+	Bitboard(U64 value);
 
-	uint64_t GetValue();
+	U64 GetValue();
 
 	Bitboard operator|(const Bitboard& other) const;
 	Bitboard operator&(const Bitboard& other) const;
@@ -18,5 +19,5 @@ public:
 	Bitboard& operator|=(const Bitboard& other);
 	Bitboard& operator&=(const Bitboard& other);
 private:
-	uint64_t m_Value;
+	U64 m_Value;
 };

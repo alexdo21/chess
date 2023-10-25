@@ -1,10 +1,10 @@
 #include "Bitboard.h"
 
-Bitboard::Bitboard(uint64_t value) : m_Value(value)
+Bitboard::Bitboard(U64 value) : m_Value(value)
 {
 }
 
-uint64_t Bitboard::GetValue()
+U64 Bitboard::GetValue()
 {
 	return m_Value;
 }

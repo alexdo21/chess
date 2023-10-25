@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="src\Bitboard.h" />
     <ClInclude Include="src\BoardUtils.h" />
+    <ClInclude Include="src\Constants.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

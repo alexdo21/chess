@@ -3,7 +3,7 @@
 namespace BoardUtils {
 	std::string GetBinRepr(Bitboard& bitboard)
 	{
-		uint64_t value = bitboard.GetValue();
+		U64 value = bitboard.GetValue();
 		std::string result;
 
 		for (int rank = 7; rank >= 0; rank--)
@@ -11,7 +11,7 @@ namespace BoardUtils {
 			for (int file = 0; file < 8; file++)
 			{
 				int square = rank * 8 + file;
-				uint64_t mask = 1ULL << square;
+				U64 mask = 1ULL << square;
 
 				result.push_back((value & mask) ? '1' : '0');
 				result.push_back(' ');
@@ -31,7 +31,7 @@ namespace BoardUtils {
 
 	std::vector<std::string> GetNotationsFromBitboard(Bitboard& bitboard)
 	{
-		uint64_t value = bitboard.GetValue();
+		U64 value = bitboard.GetValue();
 		int rank = 0;
 		int file = 97;
 		std::vector<std::string> result;
@@ -65,7 +65,7 @@ namespace BoardUtils {
 
 	int FindBitPos(Bitboard& bitboard)
 	{
-		uint64_t value = bitboard.GetValue();
+		U64 value = bitboard.GetValue();
 		for (int pos = 0; pos < 63; pos++)
 		{
 			if ((value >> pos) & 1)
@@ -76,7 +76,7 @@ namespace BoardUtils {
 		return -1;
 	}
 
-	uint64_t SetBitPos(int rank, int file)
+	U64 SetBitPos(int rank, int file)
 	{
 		return 1ULL << (rank * 8 + file);
 	}

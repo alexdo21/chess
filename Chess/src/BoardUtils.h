@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 #include <string>
 #include <iomanip>
@@ -8,6 +7,7 @@
 #include <cstdlib>
 
 #include "Bitboard.h"
+#include "Constants.h"
 
 namespace BoardUtils {
 	std::string GetBinRepr(Bitboard& bitboard);
@@ -16,7 +16,7 @@ namespace BoardUtils {
 	std::pair<int, int> GetCoordsFromNotation(std::string notation);
 	bool IsCoordsInBounds(std::pair<int, int> coords);
 	int FindBitPos(Bitboard& bitboard);
-	uint64_t SetBitPos(int rank, int file);
+	U64 SetBitPos(int rank, int file);
 	
 	Bitboard GetPawnMoves(Bitboard& bitboard);
 	Bitboard GetKnightMoves(Bitboard& bitboard);
