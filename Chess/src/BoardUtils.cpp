@@ -1,13 +1,14 @@
 #include "BoardUtils.h"
+#include <string>
 
 namespace BoardUtils {
-	std::string GetBinRepr(Bitboard& bitboard)
+	std::string PrintBoard(Bitboard& bitboard)
 	{
 		U64 value = bitboard.GetValue();
 		std::string result;
-
 		for (int rank = 7; rank >= 0; rank--)
 		{
+      result += std::to_string(rank + 1) + "  ";
 			for (int file = 0; file < 8; file++)
 			{
 				int square = rank * 8 + file;
@@ -18,9 +19,16 @@ namespace BoardUtils {
 			}
 			result += "\n";
 		}
-
+    result += "\n   a b c d e f g h\n";
 		return result;
 	}
+
+  std::string GetBinRepr(Bitboard &bitboard)
+  {
+    std::stringstream stream;
+    stream << "0b" << std::bitset<64>(bitboard.GetValue());
+    return stream.str();
+  }
 
 	std::string GetHexRepr(Bitboard& bitboard)
 	{
@@ -76,9 +84,9 @@ namespace BoardUtils {
 		return -1;
 	}
 
-	U64 SetBitPos(int rank, int file)
+	U64 SetBitPos(int pos)
 	{
-		return 1ULL << (rank * 8 + file);
+		return 1ULL << pos;
 	}
 
 	bool IsNewBitPosInBounds(int newBitPos, int oldBitPos, int dir)
@@ -99,11 +107,41 @@ namespace BoardUtils {
 		}
 		return true;
 	}
+  
+  Bitboard GetPawnMoves(Bitboard& bitboard, int side)
+  {
+    int bitPos = FindBitPos(bitboard);
+    Bitboard pawnMoves;
+    bool dir = false;
+    if (side == WHITE)
+    {
+      for (int d : std::vector<int>{ 7, 9, 8 })
+      {
+        if (IsNewBitPosInBounds(bitPos + d, bitPos, dir))
+        {
+          pawnMoves |= Bitboard(1ULL << (bitPos + d));
+        }
+        dir = !dir;
+      } 
+    }
+    else
+    { 
+      for (int d : std::vector<int>{ -9, -7, -8 })
+      {
+        if (IsNewBitPosInBounds(bitPos + d, bitPos, dir))
+        {
+          pawnMoves |= Bitboard(1ULL << (bitPos + d));
+        }
+        dir = !dir;
+      }
+    }
+    return pawnMoves;
+  }
 
 	Bitboard GetKnightMoves(Bitboard& bitboard)
 	{
 		int bitPos = FindBitPos(bitboard);
-		Bitboard knightMoves(0);
+		Bitboard knightMoves;
 		std::vector<int> bitDeltas{ 10, 6, -6, -10, 17, 15, -15, -17 };
 		bool dir = true;
 		for (int d : bitDeltas)
@@ -120,7 +158,7 @@ namespace BoardUtils {
 	Bitboard GetBishopMoves(Bitboard& bitboard)
 	{
 		int bitPos = FindBitPos(bitboard);
-		Bitboard bishopMoves(0);
+		Bitboard bishopMoves;
 
 		int upLeft = bitPos + 7;
 		while (IsNewBitPosInBounds(upLeft, bitPos, 0))
@@ -152,7 +190,7 @@ namespace BoardUtils {
 	Bitboard GetRookMoves(Bitboard& bitboard)
 	{
 		int bitPos = FindBitPos(bitboard);
-		Bitboard rookMoves(0);
+		Bitboard rookMoves;
 
 		int up = bitPos + 8;
 		while (IsNewBitPosInBounds(up, bitPos, 0))
@@ -185,4 +223,20 @@ namespace BoardUtils {
 	{
 		return GetBishopMoves(bitboard) | GetRookMoves(bitboard);
 	}
+  
+  Bitboard GetKingMoves(Bitboard &bitboard)
+  {
+    int bitPos = FindBitPos(bitboard);
+    Bitboard kingMoves;
+    kingMoves |= GetPawnMoves(bitboard, WHITE) | GetPawnMoves(bitboard, BLACK);
+    if (IsNewBitPosInBounds(bitPos - 1, bitPos, 0))
+    {
+      kingMoves |= Bitboard(1ULL << (bitPos - 1));
+    }
+    if (IsNewBitPosInBounds(bitPos + 1, bitPos, 1))
+    {
+      kingMoves |= Bitboard(1ULL << (bitPos + 1));
+    }
+    return kingMoves;
+  }
 }

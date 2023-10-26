@@ -5,55 +5,60 @@
 #include "Bitboard.h"
 #include "BoardUtils.h"
 #include "Constants.h"
-
-void InitBoard()
-{
-    Bitboard whitePawns(0x000000000000FF00);
-    Bitboard whiteKnights(0x0000000000000042);
-    Bitboard whiteBishops(0x0000000000000024);
-    Bitboard whiteRooks(0x0000000000000081);
-    Bitboard whiteQueen(0x0000000000000008);
-    Bitboard whiteKing(0x0000000000000010);
-
-    Bitboard blackPawns(0x00FF000000000000);
-    Bitboard blackKnights(0x4200000000000000);
-    Bitboard blackBishops(0x2400000000000000);
-    Bitboard blackRooks(0x8100000000000000);
-    Bitboard blackQueen(0x0800000000000000);
-    Bitboard blackKing(0x1000000000000000);
-}
+#include "Game.h"
 
 int main()
 {
-    InitBoard();
-    //Bitboard knightAtD4(0x0000000008000000);
-    //std::cout << BoardUtils::GetBinRepr(knightAtD4) << std::endl;
+    //Bitboard knightAtD4(d4);
+    //std::cout << BoardUtils::PrintBoard(knightAtD4) << std::endl;
     //Bitboard knightD4Moves = BoardUtils::GetKnightMoves(knightAtD4);
-    //std::cout << BoardUtils::GetBinRepr(knightD4Moves) << std::endl;
+    //std::cout << BoardUtils::PrintBoard(knightD4Moves) << std::endl;
 
-    //Bitboard knightAtG6(0x0000400000000000);
-    //std::cout << BoardUtils::GetBinRepr(knightAtG6) << std::endl;
+    //Bitboard knightAtG6(g6);
+    //std::cout << BoardUtils::PrintBoard(knightAtG6) << std::endl;
     //Bitboard knightG6Moves = BoardUtils::GetKnightMoves(knightAtG6);
-    //std::cout << BoardUtils::GetBinRepr(knightG6Moves) << std::endl;
+    //std::cout << BoardUtils::PrintBoard(knightG6Moves) << std::endl;
     //return 0;
 
-    //Bitboard bishopAtD4(0x0000400000000000);
-    //std::cout << BoardUtils::GetBinRepr(bishopAtD4) << std::endl;
+    //Bitboard bishopAtD4(d4);
+    //std::cout << BoardUtils::PrintBoard(bishopAtD4) << std::endl;
     //Bitboard bishopD4Moves = BoardUtils::GetBishopMoves(bishopAtD4);
-    //std::cout << BoardUtils::GetBinRepr(bishopD4Moves) << std::endl;
+    //std::cout << BoardUtils::PrintBoard(bishopD4Moves) << std::endl;
 
-    //Bitboard rookAtD4(0x0000000008000000);
-    //std::cout << BoardUtils::GetBinRepr(rookAtD4) << std::endl;
+    //Bitboard rookAtD4(d4);
+    //std::cout << BoardUtils::PrintBoard(rookAtD4) << std::endl;
     //Bitboard rookD4Moves = BoardUtils::GetRookMoves(rookAtD4);
-    //std::cout << BoardUtils::GetBinRepr(rookD4Moves) << std::endl;
+    //std::cout << BoardUtils::PrintBoard(rookD4Moves) << std::endl;
 
-    Bitboard queenAtD4(BoardUtils::SetBitPos(3, 3));
-    std::cout << BoardUtils::GetBinRepr(queenAtD4) << std::endl;
-    Bitboard queenD4Moves = BoardUtils::GetQueenMoves(queenAtD4);
-    std::cout << BoardUtils::GetBinRepr(queenD4Moves) << std::endl;
-    Bitboard pawnAtD7(BoardUtils::SetBitPos(6, 3));
-    std::cout << BoardUtils::GetBinRepr(queenD4Moves &= ~pawnAtD7);
+    // Bitboard queenAtD4(BoardUtils::SetBitPos(d4));
+    // std::cout << BoardUtils::PrintBoard(queenAtD4) << std::endl;
+    // Bitboard queenD4Moves = BoardUtils::GetQueenMoves(queenAtD4);
+    // std::cout << BoardUtils::PrintBoard(queenD4Moves) << std::endl;
+    // Bitboard pawnAtD7(BoardUtils::SetBitPos(d7));
+    // std::cout << BoardUtils::PrintBoard(queenD4Moves &= ~pawnAtD7);
 
-    std::cout << Square::a1 << std::endl;
-    std::cout << BoardUtils::SetBitPos(0, 0) << std::endl;
+    // std::cout << Square::a1 << std::endl;
+    // std::cout << BoardUtils::SetBitPos(a1) << std::endl;
+    
+    // Bitboard pawnAtD4(BoardUtils::SetBitPos(d4));
+    // std::cout << BoardUtils::PrintBoard(pawnAtD4) << std::endl;
+    // Bitboard blackPawnD4Moves = BoardUtils::GetPawnMoves(pawnAtD6, BLACK);
+    // std::cout << BoardUtils::PrintBoard(blackPawnD4Moves) << std::endl;
+
+    // std::cout << BoardUtils::PrintBoard(pawnAtD4) << std::endl;
+    // Bitboard whitePawnD4Moves = BoardUtils::GetPawnMoves(pawnAtD4, WHITE);
+    // std::cout << BoardUtils::PrintBoard(whitePawnD4Moves) << std::endl;
+    
+    // Bitboard kingAtD4(BoardUtils::SetBitPos(a1));
+    // std::cout << BoardUtils::PrintBoard(kingAtD4) << std::endl;
+    // Bitboard kingD4Moves = BoardUtils::GetKingMoves(kingAtD4);
+    // std::cout << BoardUtils::PrintBoard(kingD4Moves) << std::endl;
+
+  Game player1(WHITE);
+  Game player2(BLACK);
+
+  Bitboard player1Board = player1.GetPawns() | player1.GetKnights() | player1.GetBishops() | player1.GetRooks() | player1.GetQueen() | player1.GetKing();
+  Bitboard player2Board = player2.GetPawns() | player2.GetKnights() | player2.GetBishops() | player2.GetRooks() | player2.GetQueen() | player2.GetKing();
+  std::cout << BoardUtils::PrintBoard(player1Board) << std::endl;
+  std::cout << BoardUtils::PrintBoard(player2Board) << std::endl;
 }

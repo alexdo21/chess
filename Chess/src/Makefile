@@ -5,10 +5,10 @@ CXX = clang++
 CXXFLAGS = -std=c++20 -Wall
 
 # Source files
-SRCS = Main.cpp Game.cpp BoardUtils.cpp Bitboard.cpp
+SRCS = Main.cpp BoardUtils.cpp Bitboard.cpp Game.cpp
 
 # Header files
-HDRS = BoardUtils.h Bitboard.h
+HDRS = Constants.h BoardUtils.h Bitboard.h Game.h
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

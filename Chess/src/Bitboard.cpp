@@ -1,5 +1,9 @@
 #include "Bitboard.h"
 
+Bitboard::Bitboard() : m_Value(0)
+{
+}
+
 Bitboard::Bitboard(U64 value) : m_Value(value)
 {
 }
@@ -59,4 +63,27 @@ Bitboard& Bitboard::operator&=(const Bitboard& other)
 *
 * 0000 0000     0000    e2*a2*e1*a1
 * 0000 0000
+*/
+
+/*
+* Can't move a King into check
+* 
+* 1.) moving a King into an attacked sqauare
+* 2.) moving a King into a square that puts it into check but is not currently attacked (checking slider)
+*       - calculate attacked squares as if the King is not there
+* 
+* 3.) for each piece type, pretend there's a piece of that type on the King square, and then check legal moves     from that square to see if an actual piece of that type is there.
+* 4.) Double check
+*       - only valid moves are King (because a piece cannot block or capture two pieces at the same time)
+* 
+* 5.) Capture mask and push mask
+*       - if in check, the piece to capture must be checking piece
+*       - if the checking piece is a sliding piece, then the push mask is limited to the squares between the           King and checking piece
+* 
+* 6.) Pins
+*       - intersection of oppoonent sliding pieces and King's sliding piece moves (files, ranks, diagonals),           whichever piece lands on this intersection is pinned.
+*       - legal moves for pinned piece is calculated via removing the pinned piece (diagonals: Bishops, Queens,        Pawns (captures); non-diagonals: Rooks, Queens, Pawns (pushes))
+* 
+* 7.) En Passant
+*       - discovery check on horizontals
 */

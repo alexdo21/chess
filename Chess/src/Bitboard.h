@@ -8,6 +8,7 @@
 class Bitboard
 {
 public:
+  Bitboard();
 	Bitboard(U64 value);
 
 	U64 GetValue();
