@@ -3,8 +3,19 @@
 #include <cstdint>
 
 #define U64 uint64_t
+
 #define WHITE 0
 #define BLACK 1
+
+#define LEFT 0
+#define MIDDLE 0
+#define RIGHT 1
+
+#define PAWN_POINTS 1
+#define KNIGHT_POINTS 3
+#define BISHOP_POINTS 3
+#define ROOK_POINTS 5
+#define QUEEN_POINTS 9
 
 enum {
 	a1, b1, c1, d1, e1, f1, g1, h1,

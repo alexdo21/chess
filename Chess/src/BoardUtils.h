@@ -5,9 +5,11 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib>
+#include <bitset>
 
 #include "Bitboard.h"
 #include "Constants.h"
+#include "Game.h"
 
 namespace BoardUtils {
   std::string PrintBoard(Bitboard& bitboard);
@@ -18,11 +20,12 @@ namespace BoardUtils {
 	bool IsCoordsInBounds(std::pair<int, int> coords);
 	int FindBitPos(Bitboard& bitboard);
 	U64 SetBitPos(int pos);
+	bool IsSquareOccupied(U64 value, int bitPos);
 	
-	Bitboard GetPawnMoves(Bitboard& bitboard, int side);
-	Bitboard GetKnightMoves(Bitboard& bitboard);
-	Bitboard GetBishopMoves(Bitboard& bitboard);
-	Bitboard GetRookMoves(Bitboard& bitboard);
-	Bitboard GetQueenMoves(Bitboard& bitboard);
-	Bitboard GetKingMoves(Bitboard& bitboard);
+	Bitboard GetPawnMoves(Bitboard& bitboard, Game& p1, Game& p2);
+	Bitboard GetKnightMoves(Bitboard& bitboard, Game& p1, Game& p2);
+	Bitboard GetBishopMoves(Bitboard& bitboard, Game& p1, Game& p2);
+	Bitboard GetRookMoves(Bitboard& bitboard, Game& p1, Game& p2);
+	Bitboard GetQueenMoves(Bitboard& bitboard, Game& p1, Game& p2);
+	Bitboard GetKingMoves(Bitboard& bitboard, Game& p1, Game& p2);
 }

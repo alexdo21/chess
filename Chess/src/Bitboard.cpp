@@ -68,7 +68,7 @@ Bitboard& Bitboard::operator&=(const Bitboard& other)
 /*
 * Can't move a King into check
 * 
-* 1.) moving a King into an attacked sqauare
+* 1.) moving a King into an attacked square
 * 2.) moving a King into a square that puts it into check but is not currently attacked (checking slider)
 *       - calculate attacked squares as if the King is not there
 * 
