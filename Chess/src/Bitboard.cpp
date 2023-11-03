@@ -13,6 +13,24 @@ U64 Bitboard::GetValue()
 	return m_Value;
 }
 
+int Bitboard::GetPopCount()
+{
+	int count = 0;
+	for (int i = 0; i < 63; i++)
+	{
+		if ((m_Value >> i) & 1)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+void Bitboard::SetValue(U64 value)
+{
+	m_Value = value;
+}
+
 Bitboard Bitboard::operator|(const Bitboard& other) const
 {
 	return Bitboard(m_Value | other.m_Value);
@@ -38,6 +56,11 @@ Bitboard& Bitboard::operator&=(const Bitboard& other)
 {
 	m_Value &= other.m_Value;
 	return *this;
+}
+
+Bitboard::operator bool() const
+{
+	return m_Value > 0LL;
 }
 
 // h  e d  a h  e d  a h  e d  a h  e d  a h  e d  a h  e d  a h  e d  a h  e d  a
@@ -81,7 +104,7 @@ Bitboard& Bitboard::operator&=(const Bitboard& other)
 *       - if the checking piece is a sliding piece, then the push mask is limited to the squares between the           King and checking piece
 * 
 * 6.) Pins
-*       - intersection of oppoonent sliding pieces and King's sliding piece moves (files, ranks, diagonals),           whichever piece lands on this intersection is pinned.
+*       - intersection of opponent sliding pieces and King's sliding piece moves (files, ranks, diagonals),           whichever piece lands on this intersection is pinned.
 *       - legal moves for pinned piece is calculated via removing the pinned piece (diagonals: Bishops, Queens,        Pawns (captures); non-diagonals: Rooks, Queens, Pawns (pushes))
 * 
 * 7.) En Passant

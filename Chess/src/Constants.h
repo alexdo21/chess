@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #define U64 uint64_t
+#define MAX_VALUE 0xFFFFFFFFFFFFFFFF
 
 #define WHITE 0
 #define BLACK 1
@@ -16,6 +17,10 @@
 #define BISHOP_POINTS 3
 #define ROOK_POINTS 5
 #define QUEEN_POINTS 9
+
+enum {
+	a, b, c, d, e, f, g, h
+};
 
 enum {
 	a1, b1, c1, d1, e1, f1, g1, h1,

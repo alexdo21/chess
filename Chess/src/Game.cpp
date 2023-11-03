@@ -1,5 +1,9 @@
 #include "Game.h"
 
+Game::Game() : m_Side(WHITE)
+{
+}
+
 Game::Game(int side) : m_Side(side)
 {
   m_Pawns = side == WHITE ? Bitboard(0x000000000000FF00) : Bitboard(0x00FF000000000000);
@@ -80,6 +84,11 @@ Bitboard& Game::GetKing()
   return m_King;
 }
 
+void Game::SetSide(int side)
+{
+	m_Side = side;
+}
+
 void Game::UpdateScore(int pieceValue)
 {
 	m_Score += pieceValue;
@@ -100,9 +109,9 @@ void Game::SetHasKingMoved()
 	m_HasKingMoved = true;
 }
 
-void Game::SetPawnMoveState(int pawn, int value)
+void Game::SetPawnMoveState(int pawn, int moveState)
 {
-	m_PawnMoveStates[pawn] += value;
+	m_PawnMoveStates[pawn] = moveState;
 }
 
 void Game::SetRookMoveState(int rook)
@@ -113,4 +122,34 @@ void Game::SetRookMoveState(int rook)
 bool Game::CanCastle(int side)
 {
 	return !m_IsKingInCheck && !m_HasKingMoved && !m_RookMoveStates[side];
+}
+
+void Game::SetPawns(U64 value)
+{
+	m_Pawns.SetValue(value);
+}
+
+void Game::SetKnights(U64 value)
+{
+	m_Knights.SetValue(value);
+}
+
+void Game::SetBishops(U64 value)
+{
+	m_Bishops.SetValue(value);
+}
+
+void Game::SetRooks(U64 value)
+{
+	m_Rooks.SetValue(value);
+}
+
+void Game::SetQueen(U64 value)
+{
+	m_Queen.SetValue(value);
+}
+
+void Game::SetKing(U64 value)
+{
+	m_King.SetValue(value);
 }

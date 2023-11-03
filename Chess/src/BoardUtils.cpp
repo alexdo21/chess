@@ -11,7 +11,7 @@ namespace BoardUtils {
 			for (int file = 0; file < 8; file++)
 			{
 				int square = rank * 8 + file;
-				U64 mask = SetBitPos(square);
+				U64 mask = SetBits(square);
 
 				result.push_back((value & mask) ? '1' : '0');
 				result.push_back(' ');
@@ -83,9 +83,19 @@ namespace BoardUtils {
 		return -1;
 	}
 
-	U64 SetBitPos(int pos)
+	U64 SetBits(int position)
 	{
-		return 1ULL << pos;
+		return 1ULL << position;
+	}
+
+	U64 SetBits(std::initializer_list<int> positions)
+	{
+		U64 result = 0;
+		for (int p : positions)
+		{
+			result |= SetBits(p);
+		}
+		return result;
 	}
 
 	bool IsSquareOccupied(U64 value, int bitPos)
@@ -112,55 +122,57 @@ namespace BoardUtils {
 		return true;
 	}
 
-	bool WillKingBeInCheck(int bitPos, Game& p1, Game& p2)
+	Bitboard IsKingInCheck(int bitPos, Game& p1, Game& p2)
 	{
+		Bitboard checkers;
+
 		// pawns
 		int p1Side = p1.GetSide();
 		U64 p2PawnsValue = p2.GetPawns().GetValue();
 		int sidesAndDeltas[2][2] = { { 7, 9 }, { -9, -7 } };
 		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][0], bitPos, LEFT) && IsSquareOccupied(p2PawnsValue, bitPos + sidesAndDeltas[p1Side][0]))
 		{
-			return true;
+			checkers |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][0]));
 		}
 		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][1], bitPos, RIGHT) && IsSquareOccupied(p2PawnsValue, bitPos + sidesAndDeltas[p1Side][1]))
 		{
-			return true;
+			checkers |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][1]));
 		}
 
 		// knights
-		U64 p2KnightsValue = p2.GetKnights().GetValue();
-		Bitboard dummyKnight(SetBitPos(bitPos));
+		Bitboard dummyKnight(SetBits(bitPos));
 		Bitboard dummyKnightAttacks = GetKnightMoves(dummyKnight, p1, p2);
-		if (dummyKnightAttacks.GetValue() & p2KnightsValue)
+		Bitboard dummyKnightAndP2KnightsOverlap = dummyKnightAttacks & p2.GetKnights();
+		if (dummyKnightAndP2KnightsOverlap)
 		{
-			return true;
+			checkers |= dummyKnightAndP2KnightsOverlap;
 		}
 
 		// bishops
-		U64 p2BishopsValue = p2.GetBishops().GetValue();
-		Bitboard dummyBishop(SetBitPos(bitPos));
+		Bitboard dummyBishop(SetBits(bitPos));
 		Bitboard dummyBishopAttacks = GetBishopMoves(dummyBishop, p1, p2);
-		if (dummyBishopAttacks.GetValue() & p2BishopsValue)
+		Bitboard dummyBishopAndP2BishopsOverlap = dummyBishopAttacks & p2.GetBishops();
+		if (dummyBishopAndP2BishopsOverlap)
 		{
-			return true;
+			checkers |= Bitboard(dummyBishopAndP2BishopsOverlap);
 		}
 
 		// rooks
-		U64 p2RooksValue = p2.GetRooks().GetValue();
-		Bitboard dummyRook(SetBitPos(bitPos));
+		Bitboard dummyRook(SetBits(bitPos));
 		Bitboard dummyRookAttacks = GetRookMoves(dummyRook, p1, p2);
-		if (dummyRookAttacks.GetValue() & p2RooksValue)
+		Bitboard dummyRookAndP2RooksOverlap = dummyRookAttacks & p2.GetRooks();
+		if (dummyRookAndP2RooksOverlap)
 		{
-			return true;
+			checkers |= Bitboard(dummyRookAndP2RooksOverlap);
 		}
 
 		// queen
-		U64 p2QueenValue = p2.GetQueen().GetValue();
-		Bitboard dummyQueen(SetBitPos(bitPos));
+		Bitboard dummyQueen(SetBits(bitPos));
 		Bitboard dummyQueenAttacks = GetQueenMoves(dummyQueen, p1, p2);
-		if (dummyQueenAttacks.GetValue() & p2QueenValue)
+		Bitboard dummyQueenAndP2QueenOverlap = dummyRookAttacks & p2.GetQueen();
+		if (dummyQueenAndP2QueenOverlap)
 		{
-			return true;
+			checkers |= Bitboard(dummyQueenAndP2QueenOverlap);
 		}
 
 		// king
@@ -170,7 +182,7 @@ namespace BoardUtils {
 		{
 			if (IsNewBitPosInBounds(bitPos + d, bitPos, LEFT) && IsSquareOccupied(p2KingValue, bitPos + d))
 			{
-				return true;
+				checkers |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 		int middleDeltas[2] = { -8, 8 };
@@ -178,7 +190,7 @@ namespace BoardUtils {
 		{
 			if (IsNewBitPosInBounds(bitPos + d, bitPos, MIDDLE) && IsSquareOccupied(p2KingValue, bitPos + d))
 			{
-				return true;
+				checkers |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 		int rightDeltas[3] = { -7, 1, 9 };
@@ -186,11 +198,11 @@ namespace BoardUtils {
 		{
 			if (IsNewBitPosInBounds(bitPos + d, bitPos, RIGHT) && IsSquareOccupied(p2KingValue, bitPos + d))
 			{
-				return true;
+				checkers |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 
-		return false;
+		return checkers;
 	}
 
 	Bitboard GetPawnMoves(Bitboard& bitboard, Game& p1, Game& p2)
@@ -206,34 +218,34 @@ namespace BoardUtils {
 		int sidesAndDeltas[2][6] = { { 16, 7, 8, 9, 7, 9 }, { -16, -9, -8, -7, -9, -7 } };
 
 		// move 2
-		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][0], bitPos, MIDDLE) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + sidesAndDeltas[p1Side][0]) && p1PawnMoveStates[bitPos % 8] == 0)
+		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][0], bitPos, MIDDLE) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + sidesAndDeltas[p1Side][2]) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + sidesAndDeltas[p1Side][0]) && p1PawnMoveStates[bitPos % 8] == 0)
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][0]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][0]));
 		}
 		// attack left
 		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][1], bitPos, LEFT) && IsSquareOccupied(p2BoardValue, bitPos + sidesAndDeltas[p1Side][1]))
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][1]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][1]));
 		}
 		// move 1
 		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][2], bitPos, MIDDLE) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + sidesAndDeltas[p1Side][2]))
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][2]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][2]));
 		}
 		// attack right
 		if (IsNewBitPosInBounds(bitPos + sidesAndDeltas[p1Side][3], bitPos, RIGHT) && IsSquareOccupied(p2BoardValue, bitPos + sidesAndDeltas[p1Side][3]))
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][3]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][3]));
 		}
 		// en passant left
 		if (IsNewBitPosInBounds(bitPos + -1, bitPos, LEFT) && IsSquareOccupied(p2PawnsValue, bitPos + -1) && p2PawnMoveStates[(bitPos + -1) % 8] == 2)
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][4]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][4]));
 		}
 		// en passant right
 		if (IsNewBitPosInBounds(bitPos + 1, bitPos, RIGHT) && IsSquareOccupied(p2PawnsValue, bitPos + 1) && p2PawnMoveStates[(bitPos + 1) % 8] == 2)
 		{
-			pawnMoves |= Bitboard(SetBitPos(bitPos + sidesAndDeltas[p1Side][5]));
+			pawnMoves |= Bitboard(SetBits(bitPos + sidesAndDeltas[p1Side][5]));
 		}
 		return pawnMoves;
 	}
@@ -242,14 +254,14 @@ namespace BoardUtils {
 	{
 		int bitPos = FindBitPos(bitboard);
 		Bitboard knightMoves;
-		int p1BoardValue = p1.GetBoard().GetValue();
+		U64 p1BoardValue = p1.GetBoard().GetValue();
 		std::vector<int> bitDeltas{ 10, 6, -6, -10, 17, 15, -15, -17 };
 		bool dir = true;
 		for (int d : bitDeltas)
 		{
 			if (IsNewBitPosInBounds(bitPos + d, bitPos, dir) && !IsSquareOccupied(p1BoardValue, bitPos + d))
 			{
-				knightMoves |= Bitboard(SetBitPos(bitPos + d));
+				knightMoves |= Bitboard(SetBits(bitPos + d));
 			}
 			dir = !dir;
 		}
@@ -270,7 +282,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			bishopMoves |= Bitboard(SetBitPos(upLeft));
+			bishopMoves |= Bitboard(SetBits(upLeft));
 			if (IsSquareOccupied(p2BoardValue, upLeft))
 			{
 				break;
@@ -284,7 +296,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			bishopMoves |= Bitboard(SetBitPos(upRight));
+			bishopMoves |= Bitboard(SetBits(upRight));
 			if (IsSquareOccupied(p2BoardValue, upRight))
 			{
 				break;
@@ -298,7 +310,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			bishopMoves |= Bitboard(SetBitPos(downLeft));
+			bishopMoves |= Bitboard(SetBits(downLeft));
 			if (IsSquareOccupied(p2BoardValue, downLeft))
 			{
 				break;
@@ -312,7 +324,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			bishopMoves |= Bitboard(SetBitPos(downRight));
+			bishopMoves |= Bitboard(SetBits(downRight));
 			if (IsSquareOccupied(p2BoardValue, downRight))
 			{
 				break;
@@ -336,7 +348,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			rookMoves |= Bitboard(SetBitPos(up));
+			rookMoves |= Bitboard(SetBits(up));
 			if (IsSquareOccupied(p2BoardValue, up))
 			{
 				break;
@@ -350,7 +362,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			rookMoves |= Bitboard(SetBitPos(down));
+			rookMoves |= Bitboard(SetBits(down));
 			if (IsSquareOccupied(p2BoardValue, down))
 			{
 				break;
@@ -364,7 +376,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			rookMoves |= Bitboard(SetBitPos(left));
+			rookMoves |= Bitboard(SetBits(left));
 			if (IsSquareOccupied(p2BoardValue, left))
 			{
 				break;
@@ -378,7 +390,7 @@ namespace BoardUtils {
 			{
 				break;
 			}
-			rookMoves |= Bitboard(SetBitPos(right));
+			rookMoves |= Bitboard(SetBits(right));
 			if (IsSquareOccupied(p2BoardValue, right))
 			{
 				break;
@@ -403,36 +415,36 @@ namespace BoardUtils {
 		int leftDeltas[3] = { 7, -1, -9 };
 		for (int d : leftDeltas)
 		{
-			if (IsNewBitPosInBounds(bitPos + d, bitPos, LEFT) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !WillKingBeInCheck(bitPos + d, p1, p2))
+			if (IsNewBitPosInBounds(bitPos + d, bitPos, LEFT) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !IsKingInCheck(bitPos + d, p1, p2))
 			{
-				kingMoves |= Bitboard(SetBitPos(bitPos + d));
+				kingMoves |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 		int middleDeltas[2] = { -8, 8 };
 		for (int d : middleDeltas)
 		{
-			if (IsNewBitPosInBounds(bitPos + d, bitPos, MIDDLE) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !WillKingBeInCheck(bitPos + d, p1, p2))
+			if (IsNewBitPosInBounds(bitPos + d, bitPos, MIDDLE) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !IsKingInCheck(bitPos + d, p1, p2))
 			{
-				kingMoves |= Bitboard(SetBitPos(bitPos + d));
+				kingMoves |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 		int rightDeltas[3] = { -7, 1, 9 };
 		for (int d : rightDeltas)
 		{
-			if (IsNewBitPosInBounds(bitPos + d, bitPos, RIGHT) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !WillKingBeInCheck(bitPos + d, p1, p2))
+			if (IsNewBitPosInBounds(bitPos + d, bitPos, RIGHT) && !IsSquareOccupied(p1BoardValue, bitPos + d) && !IsKingInCheck(bitPos + d, p1, p2))
 			{
-				kingMoves |= Bitboard(SetBitPos(bitPos + d));
+				kingMoves |= Bitboard(SetBits(bitPos + d));
 			}
 		}
 		// castle left
-		if ((p1.CanCastle(LEFT)) && (!IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + -1) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + -2)) && (!WillKingBeInCheck(bitPos + -1, p1, p2) && !WillKingBeInCheck(bitPos + -2, p1, p2)))
+		if ((p1.CanCastle(LEFT)) && (!IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + -1) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + -2)) && (!IsKingInCheck(bitPos + -1, p1, p2) && !IsKingInCheck(bitPos + -2, p1, p2)))
 		{
-			kingMoves |= Bitboard(SetBitPos(bitPos + -2));
+			kingMoves |= Bitboard(SetBits(bitPos + -2));
 		}
 		// castle right
-		if (p2.CanCastle(RIGHT) && (!IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + 1) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + 2)) && (!WillKingBeInCheck(bitPos + 1, p1, p2) && !WillKingBeInCheck(bitPos + -2, p1, p2)))
+		if (p2.CanCastle(RIGHT) && (!IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + 1) && !IsSquareOccupied(p1BoardValue | p2BoardValue, bitPos + 2)) && (!IsKingInCheck(bitPos + 1, p1, p2) && !IsKingInCheck(bitPos + -2, p1, p2)))
 		{
-			kingMoves |= Bitboard(SetBitPos(bitPos + 2));
+			kingMoves |= Bitboard(SetBits(bitPos + 2));
 		}
 		return kingMoves;
 	}
